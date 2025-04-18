@@ -7,9 +7,16 @@ import 'package:app_links/app_links.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AuthService {
+  /// Borra tokens y datos de sesión para forzar re-autenticación
+  Future<void> signOut() async {
+    await _storage.delete(key: 'access_token');
+    await _storage.delete(key: 'refresh_token');
+    await _storage.delete(key: 'token_expiry');
+    await _storage.delete(key: 'pkce_code_verifier');
+  }
   static const String clientId = '4caddaabcd134c6da47d4f7d1c7877ba';
   static const String redirectUri = 'https://spotify-callback.vercel.app/api/callback';
-  static const String scopes = 'user-read-playback-state user-modify-playback-state user-read-currently-playing playlist-read-private playlist-read-collaborative streaming';
+  static const String scopes = 'user-read-playback-state user-modify-playback-state user-read-currently-playing playlist-read-private playlist-read-collaborative streaming user-top-read';
   static const String tokenUrl = 'https://accounts.spotify.com/api/token';
   static const String authUrl = 'https://accounts.spotify.com/authorize';
   final FlutterSecureStorage _storage = const FlutterSecureStorage();

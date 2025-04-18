@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'task_manager.dart';
+import '../models/spotify_track.dart';
+import 'package:http/http.dart' as http;
+import 'settings_screen.dart';
+import 'dart:convert';
+import '../services/auth_service.dart';
 
 class MainPlayerScreen extends StatefulWidget {
   @override
@@ -20,7 +25,11 @@ class _MainPlayerScreenState extends State<MainPlayerScreen> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.settings, color: Colors.white70),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const SettingsScreen()),
+            );
+          },
         ),
         actions: [
           IconButton(
@@ -170,15 +179,85 @@ class _MainPlayerScreenState extends State<MainPlayerScreen> {
 
 
   Widget _buildPlayerContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Aquí irá el reproductor de música
-        const Text('Reproductor', style: TextStyle(color: Colors.white, fontSize: 20)),
-        const SizedBox(height: 24),
-      ],
+    return FutureBuilder<List<SpotifyTrack>>(
+      future: getSpotifyTracks(context),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: \\${snapshot.error}', style: const TextStyle(color: Colors.white)));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No hay canciones para mostrar', style: TextStyle(color: Colors.white)));
+        }
+        final tracks = snapshot.data!;
+        return ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: tracks.length,
+          separatorBuilder: (_, __) => const Divider(color: Colors.white24, height: 1),
+          itemBuilder: (context, index) {
+            final track = tracks[index];
+            return ListTile(
+              leading: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(track.albumArtUrl, width: 48, height: 48, fit: BoxFit.cover),
+              ),
+              title: Text(track.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              subtitle: Text(track.artist, style: const TextStyle(color: Colors.white70)),
+              trailing: Text(track.duration, style: const TextStyle(color: Color(0xFFe0c36a))),
+              onTap: () {
+                // Aquí puedes reproducir la canción usando Spotify SDK o API
+              },
+            );
+          },
+        );
+      },
     );
   }
+
+  Future<List<SpotifyTrack>> getSpotifyTracks(BuildContext context) async {
+    // Importa AuthService y http arriba si no están importados
+    // import 'package:http/http.dart' as http;
+    // import '../services/auth_service.dart';
+    final auth = AuthService();
+    final token = await auth.getAccessToken();
+    if (token == null) throw 'No se encontró el token de sesión de Spotify.';
+
+    final url = Uri.parse('https://api.spotify.com/v1/me/top/tracks?limit=20');
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode != 200) {
+      throw 'Error al obtener canciones: ${response.statusCode}\n${response.body}';
+    }
+    final data = json.decode(response.body);
+    final items = data['items'] as List<dynamic>;
+    return items.map((item) {
+      final durationMs = item['duration_ms'] as int? ?? 0;
+      final duration = _formatDuration(Duration(milliseconds: durationMs));
+      return SpotifyTrack(
+        title: item['name'] ?? '',
+        artist: (item['artists'] as List).isNotEmpty ? item['artists'][0]['name'] : '',
+        duration: duration,
+        albumArtUrl: item['album'] != null && (item['album']['images'] as List).isNotEmpty
+            ? item['album']['images'][0]['url']
+            : '',
+      );
+    }).toList();
+  }
+
+  String _formatDuration(Duration d) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final minutes = twoDigits(d.inMinutes.remainder(60));
+    final seconds = twoDigits(d.inSeconds.remainder(60));
+    return '$minutes:$seconds';
+  }
+
+
 
 
 
