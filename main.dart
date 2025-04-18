@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'services/auth_service.dart';
 import 'screens/main_player_screen.dart';
+import 'screens/task_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,19 +18,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Spotify Player',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
+    return ChangeNotifierProvider(
+      create: (_) => TaskProvider(),
+      child: MaterialApp(
+        title: 'Spotify Player',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          useMaterial3: true,
+        ),
+        home: const SplashDecider(),
       ),
-      home: const SplashDecider(),
     );
   }
 }
 
 class SplashDecider extends StatefulWidget {
   const SplashDecider({Key? key}) : super(key: key);
+
   @override
   State<SplashDecider> createState() => _SplashDeciderState();
 }

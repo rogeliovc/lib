@@ -150,13 +150,16 @@ class TaskManagerScreen extends StatelessWidget {
   Widget _priorityChip(String priority) {
     Color color;
     switch (priority) {
-      case 'Volumen al 100':
+      case 'Urgente':
         color = Colors.red;
         break;
-      case 'Coro pegajoso':
+      case 'Alta':
+        color = Colors.orange;
+        break;
+      case 'Media':
         color = Colors.yellow[800]!;
         break;
-      case 'Beat suave':
+      case 'Baja':
         color = Colors.green[700]!;
         break;
       default:
@@ -175,18 +178,35 @@ class TaskManagerScreen extends StatelessWidget {
 
   Widget _labelChip(String label) {
     Color color;
+    Color textColor = Colors.black;
     switch (label) {
       case 'Investigación':
-        color = Colors.black;
+        color = Colors.blue[900]!;
+        textColor = Colors.white;
         break;
       case 'Estudio':
-        color = Colors.white;
+        color = Colors.orange[300]!;
         break;
       case 'Ejercicio':
-        color = Colors.white;
+        color = Colors.green[300]!;
         break;
       case 'Viaje':
-        color = Colors.white;
+        color = Colors.purple[200]!;
+        break;
+      case 'Trabajo':
+        color = Colors.teal[200]!;
+        break;
+      case 'Personal':
+        color = Colors.pink[200]!;
+        break;
+      case 'Salud':
+        color = Colors.red[200]!;
+        break;
+      case 'Finanzas':
+        color = Colors.amber[300]!;
+        break;
+      case 'Otro':
+        color = Colors.grey[400]!;
         break;
       default:
         color = Colors.grey;
@@ -198,7 +218,7 @@ class TaskManagerScreen extends StatelessWidget {
         border: Border.all(color: color, width: 1),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Text(label, style: TextStyle(color: color == Colors.white ? Colors.black : color, fontWeight: FontWeight.bold, fontSize: 13)),
+      child: Text(label, style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 13)),
     );
   }
 }
@@ -216,7 +236,7 @@ class _TaskAdderState extends State<TaskAdder> {
   String _title = '';
   String _description = '';
   DateTime? _dueDate;
-  String _priority = 'Volumen al 100';
+  String _priority = 'Urgente';
   String _label = 'Investigación';
 
   @override
@@ -274,22 +294,28 @@ class _TaskAdderState extends State<TaskAdder> {
                 spacing: 8,
                 children: [
                   ChoiceChip(
-                    label: const Text('Volumen al 100'),
-                    selected: _priority == 'Volumen al 100',
+                    label: const Text('Urgente'),
+                    selected: _priority == 'Urgente',
                     selectedColor: Colors.red[700],
-                    onSelected: (_) => setState(() => _priority = 'Volumen al 100'),
+                    onSelected: (_) => setState(() => _priority = 'Urgente'),
                   ),
                   ChoiceChip(
-                    label: const Text('Coro pegajoso'),
-                    selected: _priority == 'Coro pegajoso',
+                    label: const Text('Alta'),
+                    selected: _priority == 'Alta',
+                    selectedColor: Colors.orange[700],
+                    onSelected: (_) => setState(() => _priority = 'Alta'),
+                  ),
+                  ChoiceChip(
+                    label: const Text('Media'),
+                    selected: _priority == 'Media',
                     selectedColor: Colors.yellow[700],
-                    onSelected: (_) => setState(() => _priority = 'Coro pegajoso'),
+                    onSelected: (_) => setState(() => _priority = 'Media'),
                   ),
                   ChoiceChip(
-                    label: const Text('Beat suave'),
-                    selected: _priority == 'Beat suave',
+                    label: const Text('Baja'),
+                    selected: _priority == 'Baja',
                     selectedColor: Colors.green[700],
-                    onSelected: (_) => setState(() => _priority = 'Beat suave'),
+                    onSelected: (_) => setState(() => _priority = 'Baja'),
                   ),
                 ],
               ),
@@ -299,31 +325,67 @@ class _TaskAdderState extends State<TaskAdder> {
                 spacing: 8,
                 children: [
                   ChoiceChip(
-                    label: const Text('Investigación'),
+                    label: const Text('Investigación', style: TextStyle(color: Colors.black)),
                     selected: _label == 'Investigación',
-                    selectedColor: Colors.black,
+                    selectedColor: Colors.blue[900],
+                    backgroundColor: Colors.white,
                     onSelected: (_) => setState(() => _label = 'Investigación'),
                   ),
                   ChoiceChip(
                     label: const Text('Estudio'),
                     selected: _label == 'Estudio',
-                    selectedColor: Colors.white,
+                    selectedColor: Colors.orange[300],
                     labelStyle: const TextStyle(color: Colors.black),
                     onSelected: (_) => setState(() => _label = 'Estudio'),
                   ),
                   ChoiceChip(
                     label: const Text('Ejercicio'),
                     selected: _label == 'Ejercicio',
-                    selectedColor: Colors.white,
+                    selectedColor: Colors.green[300],
                     labelStyle: const TextStyle(color: Colors.black),
                     onSelected: (_) => setState(() => _label = 'Ejercicio'),
                   ),
                   ChoiceChip(
                     label: const Text('Viaje'),
                     selected: _label == 'Viaje',
-                    selectedColor: Colors.white,
+                    selectedColor: Colors.purple[200],
                     labelStyle: const TextStyle(color: Colors.black),
                     onSelected: (_) => setState(() => _label = 'Viaje'),
+                  ),
+                  ChoiceChip(
+                    label: const Text('Trabajo'),
+                    selected: _label == 'Trabajo',
+                    selectedColor: Colors.teal[200],
+                    labelStyle: const TextStyle(color: Colors.black),
+                    onSelected: (_) => setState(() => _label = 'Trabajo'),
+                  ),
+                  ChoiceChip(
+                    label: const Text('Personal'),
+                    selected: _label == 'Personal',
+                    selectedColor: Colors.pink[200],
+                    labelStyle: const TextStyle(color: Colors.black),
+                    onSelected: (_) => setState(() => _label = 'Personal'),
+                  ),
+                  ChoiceChip(
+                    label: const Text('Salud'),
+                    selected: _label == 'Salud',
+                    selectedColor: Colors.red[200],
+                    labelStyle: const TextStyle(color: Colors.black),
+                    onSelected: (_) => setState(() => _label = 'Salud'),
+                  ),
+                  ChoiceChip(
+                    label: const Text('Finanzas'),
+                    selected: _label == 'Finanzas',
+                    selectedColor: Colors.amber[300],
+                    labelStyle: const TextStyle(color: Colors.black),
+                    onSelected: (_) => setState(() => _label = 'Finanzas'),
+                  ),
+                  ChoiceChip(
+                    label: const Text('Otro'),
+                    selected: _label == 'Otro',
+                    selectedColor: Colors.grey[400],
+                    labelStyle: const TextStyle(color: Colors.black),
+                    onSelected: (_) => setState(() => _label = 'Otro'),
                   ),
                 ],
               ),
